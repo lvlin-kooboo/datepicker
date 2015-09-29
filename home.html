@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Document</title>
+		<meta name="viewport" content="width=device-width,user-scalable=no">
+		<style>
+		body,ul,li{
+			margin: 0;
+			padding: 0;
+		}
+		ul{
+			list-style: none;
+		}
+		#calendar{
+			width: 350px;
+			padding: 5px;
+			margin: 0 auto;
+			background: rgba(130,150,50,1);
+		}
+		#cap{
+			overflow: hidden;
+		}
+		#year{
+			float: left;
+			text-align: center;
+			width: 200px;
+		}
+		.current{
+			float: left;
+			color: #fff;
+		}
+		.prev{
+			float: left;
+		}
+		.next{
+			float: right;
+		}
+		.prev,.next,.current{
+			font-size: 18px;
+			line-height: 30px;
+			width: 50px;
+			text-align: center;
+			cursor: pointer;
+		}
+		.bd{
+			overflow: hidden;
+		}
+		.bd li{
+			float: left;
+			width: 40px;
+			height: 40px;
+			margin: 5px;
+			font-size: 20px;
+			line-height: 40px;
+			text-align: center;
+			background: #FCFF04;
+		}
+		.bd .gray{
+			background: #eee;
+		}
+		.week li{
+			font-size: 12px;
+			background: #eee;
+		}
+		.bd .active{
+			background: red;
+		}
+		</style>
+	</head>
+	<body>
+		<input type="text" id="text">
+		<div id="calendar">
+			<div id="cap">
+				<span class="prev">prev</span>
+				<div id="year"></div>
+				<span class="current">今天</span>
+				<span class="next">next</span>
+			</div>
+			<div class="bd">
+				<ul class="week">
+					<li>星期日</li>
+					<li>星期一</li>
+					<li>星期二</li>
+					<li>星期三</li>
+					<li>星期四</li>
+					<li>星期五</li>
+					<li>星期六</li>
+				</ul>
+			</div>
+		</div>
+		<script>
+			window.onload = function(){
+				var calendar = document.getElementById('calendar'),
+					prev = calendar.querySelector('.prev'),
+					next = calendar.querySelector('.next'),
+					container = calendar.querySelector('.bd'),
+					title = calendar.querySelector('#year'),
+					currentDate = new Date(),
+					activeDate = new Date(),
+					current = document.querySelector('.current'),
+					fragment = document.createDocumentFragment(),
+					month = currentDate.getMonth(),
+					year = currentDate.getFullYear();
+					title.innerHTML = year +'年' + (month+1) + '月';
+				activeDate.setDate(1);
+				var diff = 1 - activeDate.getDay() == 0 ? -7 : 1 - activeDate.getDay() ;
+				activeDate.setDate(diff);
+				for(var i=0; i<42;i++){
+					var li = document.createElement('li');
+					var date = activeDate.getDate();
+					if(activeDate.getMonth()!=month){
+						li.className+='gray';
+					}
+					if(date == currentDate.getDate()){
+						li.className +=' active'
+					}
+					li.innerHTML = date;
+					activeDate.setDate(date+1);
+					fragment.appendChild(li);
+				}
+				var ul = document.createElement('ul');
+				ul.appendChild(fragment);
+				container.appendChild(ul);
+
+				window.addEventListener('click',function(e){console.log(e.target + '_' + e.currentTarget +'_' +  e.eventPhase +'_'+ e.timeStamp)},true);
+				calendar.addEventListener('click',function(e){console.log('catch1');console.log(e.target + '_' + e.currentTarget)},true);
+				prev.addEventListener('click',function(e){console.log('catch2');console.log(e.target + '_' + e.currentTarget)},true);
+				prev.addEventListener('click',function(){setMonth(--month)},false);
+				next.addEventListener('click',function(){setMonth(++month)},false);
+				current.addEventListener('click',function(){
+					setMonth((month=currentDate.getMonth()))
+				},false)
+
+				// container.addEventListener('click',getDateString,false);
+
+				function getDateString(e){
+					var target = e.target || e.srcElement;
+					var text = document.getElementById('text');
+					if(target.tagName =='LI' && container.lastChild.contains(target)){
+						var d = activeDate.getFullYear() + '-' + (activeDate.getMonth()+1) + '-' + target.innerHTML;
+						text.value = d;
+					}
+				}
+
+				function setMonth(m){
+					activeDate = new Date(year,m);
+					var month = activeDate.getMonth();
+					title.innerHTML = activeDate.getFullYear()+'年' + (month+1) + '月';
+					// activeDate.setDate(1);
+					console.log(activeDate.getDay())
+					diff = 1 - activeDate.getDay() == 1 ? -6 : 1-activeDate.getDay();
+					activeDate.setDate(diff);
+					for(var i=0; i<42;i++){
+						var li = document.createElement('li');
+						var date = activeDate.getDate();
+						if(activeDate.getMonth()!=month){
+							li.className+='gray';
+						}
+						if(date == currentDate.getDate()&& activeDate.getMonth() == month){
+							li.className +=' active'
+						}
+						li.innerHTML = date;
+						li.onclick = function(){
+							console.log(1)
+						};
+						// li.addEventListener('click',getDateString,false);
+						activeDate.setDate(date+1);
+						fragment.appendChild(li);
+					}
+					var ul = document.createElement('ul');
+					ul.appendChild(fragment);
+					container.replaceChild(ul,container.lastChild);
+				}
+			}
+		</script>
+	</body>
+</html>
